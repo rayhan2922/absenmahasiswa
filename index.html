@@ -30,8 +30,8 @@
      </div>
     </div><!-- Attendance Form -->
     <div class="bg-white rounded-lg shadow-lg p-6">
-     <form id="attendanceForm" class="space-y-6"><!-- Student Selection -->
-      <div><label for="studentName" class="block text-sm font-medium text-gray-700 mb-2">Nama Mahasiswa</label> <select id="studentName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required> <option value="">Pilih Nama Mahasiswa</option> </select>
+     <form id="attendanceForm" class="space-y-6"><!-- Student Name Input -->
+      <div><label for="studentName" class="block text-sm font-medium text-gray-700 mb-2">Nama Mahasiswa</label> <input type="text" id="studentName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan nama lengkap mahasiswa" required>
       </div><!-- Semester Selection -->
       <div><label for="semester" class="block text-sm font-medium text-gray-700 mb-2">Semester</label> <select id="semester" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required> <option value="">Pilih Semester</option> <option value="1">Semester 1</option> <option value="Transfer">Transfer</option> </select>
       </div><!-- Department Selection -->
@@ -148,7 +148,6 @@
                 studentData = data.filter(record => !record.status_absensi);
                 recordCount = data.length;
                 
-                updateStudentDropdown();
                 updateRekapTable();
                 updateStudentList();
             }
@@ -465,18 +464,6 @@
         }
 
         // Update functions
-        function updateStudentDropdown() {
-            const dropdown = document.getElementById('studentName');
-            dropdown.innerHTML = '<option value="">Pilih Nama Mahasiswa</option>';
-            
-            studentData.forEach(student => {
-                const option = document.createElement('option');
-                option.value = student.nama_mahasiswa;
-                option.textContent = `${student.nama_mahasiswa} - ${student.jurusan} (${student.semester})`;
-                dropdown.appendChild(option);
-            });
-        }
-
         function updateRekapTable() {
             const tbody = document.getElementById('rekapTableBody');
             
@@ -612,5 +599,5 @@
         // Initialize the application
         initializeApp();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99892b9135fd8336',t:'MTc2MjE0NDU4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99895dcef0013f8e',t:'MTc2MjE0NjYzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
