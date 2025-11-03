@@ -3,137 +3,172 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Absensi Mahasiswa</title>
+  <title>Absensi Digital Mahasiswa</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/_sdk/data_sdk.js"></script>
   <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
   <style>
         body {
             box-sizing: border-box;
         }
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
         }
     </style>
   <style>@view-transition { navigation: auto; }</style>
  </head>
  <body class="h-full bg-gradient-to-br from-blue-50 to-indigo-100 font-sans">
-  <div class="min-h-full flex flex-col"><!-- Header -->
-   <header class="bg-white shadow-sm border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+  <div id="app" class="min-h-full"><!-- Student Attendance Page -->
+   <div id="studentPage" class="container mx-auto px-4 py-6"><!-- Header -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+     <div class="flex justify-between items-start">
+      <div>
+       <h1 id="judulAplikasi" class="text-2xl font-bold text-gray-800 mb-2">ABSENSI MAHASISWA AIK STIT MUHAMMADIYAH TEMPURREJO DARING</h1>
+       <p id="namaInstitusi" class="text-gray-600">Sistem Absensi Digital</p>
+      </div><button id="adminLoginBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm transition-colors"> Admin </button>
+     </div>
+    </div><!-- Attendance Form -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+     <form id="attendanceForm" class="space-y-6"><!-- Student Selection -->
+      <div><label for="studentName" class="block text-sm font-medium text-gray-700 mb-2">Nama Mahasiswa</label> <select id="studentName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required> <option value="">Pilih Nama Mahasiswa</option> </select>
+      </div><!-- Semester Selection -->
+      <div><label for="semester" class="block text-sm font-medium text-gray-700 mb-2">Semester</label> <select id="semester" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required> <option value="">Pilih Semester</option> <option value="1">Semester 1</option> <option value="Transfer">Transfer</option> </select>
+      </div><!-- Department Selection -->
+      <div><label for="jurusan" class="block text-sm font-medium text-gray-700 mb-2">Jurusan</label> <select id="jurusan" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required> <option value="">Pilih Jurusan</option> <option value="PAI">PAI</option> <option value="PGMI">PGMI</option> <option value="MPI">MPI</option> <option value="PIAUD">PIAUD</option> <option value="Kelas PONDOK">Kelas PONDOK</option> </select>
+      </div><!-- Attendance Status -->
+      <div><label class="block text-sm font-medium text-gray-700 mb-3">Status Kehadiran</label>
+       <div class="flex gap-4"><button type="button" id="hadirBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"> Hadir </button> <button type="button" id="sakitBtn" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"> Sakit </button> <button type="button" id="izinBtn" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"> Izin </button>
+       </div>
+      </div><!-- Date Selection -->
+      <div><label for="tanggal" class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label> <input type="date" id="tanggal" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+      </div><!-- Submit Button --> <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"> Simpan Absensi </button>
+     </form>
+    </div>
+   </div><!-- Admin Login Modal -->
+   <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-96 mx-4">
+     <h2 class="text-xl font-bold mb-4">Login Admin</h2>
+     <form id="loginForm">
+      <div class="mb-4"><label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label> <input type="text" id="username" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+      </div>
+      <div class="mb-6"><label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" id="password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+      </div>
+      <div class="flex gap-3"><button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors"> Login </button> <button type="button" id="cancelLogin" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors"> Batal </button>
+      </div>
+     </form>
+     <div id="loginError" class="mt-3 text-red-600 text-sm hidden"></div>
+    </div>
+   </div><!-- Admin Page -->
+   <div id="adminPage" class="hidden container mx-auto px-4 py-6"><!-- Admin Header -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
      <div class="flex justify-between items-center">
-      <h1 id="app-title" class="text-2xl font-bold text-gray-900">Sistem Absensi Mahasiswa</h1><button id="admin-btn" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded-full transition-colors"> Admin </button>
+      <h1 class="text-2xl font-bold text-gray-800">Panel Admin - Absensi Mahasiswa</h1><button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"> Logout </button>
+     </div>
+    </div><!-- Admin Tabs -->
+    <div class="bg-white rounded-lg shadow-lg mb-6">
+     <div class="border-b border-gray-200">
+      <nav class="flex"><button id="rekapTab" class="px-6 py-3 text-blue-600 border-b-2 border-blue-600 font-medium"> Rekap Absensi </button> <button id="mahasiswaTab" class="px-6 py-3 text-gray-500 hover:text-gray-700 font-medium"> Data Mahasiswa </button> <button id="downloadTab" class="px-6 py-3 text-gray-500 hover:text-gray-700 font-medium"> Download Laporan </button>
+      </nav>
+     </div><!-- Rekap Absensi Content -->
+     <div id="rekapContent" class="p-6">
+      <h3 class="text-lg font-semibold mb-4">Rekap Absensi</h3>
+      <div class="overflow-x-auto">
+       <table class="w-full border-collapse border border-gray-300">
+        <thead>
+         <tr class="bg-gray-50">
+          <th class="border border-gray-300 px-4 py-2 text-left">Nama</th>
+          <th class="border border-gray-300 px-4 py-2 text-left">Semester</th>
+          <th class="border border-gray-300 px-4 py-2 text-left">Jurusan</th>
+          <th class="border border-gray-300 px-4 py-2 text-left">Status</th>
+          <th class="border border-gray-300 px-4 py-2 text-left">Tanggal</th>
+         </tr>
+        </thead>
+        <tbody id="rekapTableBody">
+         <tr>
+          <td colspan="5" class="border border-gray-300 px-4 py-8 text-center text-gray-500">Belum ada data absensi</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div><!-- Data Mahasiswa Content -->
+     <div id="mahasiswaContent" class="p-6 hidden">
+      <div class="flex justify-between items-center mb-4">
+       <h3 class="text-lg font-semibold">Data Mahasiswa</h3><button id="addStudentBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"> Tambah Mahasiswa </button>
+      </div>
+      <div id="studentList" class="space-y-3">
+       <div class="text-gray-500 text-center py-8">
+        Belum ada data mahasiswa. Klik "Tambah Mahasiswa" untuk menambah data.
+       </div>
+      </div>
+     </div><!-- Download Content -->
+     <div id="downloadContent" class="p-6 hidden">
+      <h3 class="text-lg font-semibold mb-4">Download Laporan Absensi</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><button id="downloadWeekly" class="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"> Download Mingguan </button> <button id="downloadMonthly" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"> Download Bulanan </button> <button id="downloadYearly" class="bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"> Download Tahunan </button>
+      </div>
      </div>
     </div>
-   </header><!-- Main Content -->
-   <main class="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8"><!-- Student Attendance Page -->
-    <div id="student-page" class="space-y-6">
-     <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 id="welcome-message" class="text-xl font-semibold text-gray-800 mb-6">Selamat datang di sistem absensi</h2><!-- Date Display -->
-      <div class="mb-6 p-4 bg-blue-50 rounded-lg">
-       <p class="text-sm text-blue-600 font-medium">Tanggal Hari Ini</p>
-       <p id="current-date" class="text-lg font-bold text-blue-800"></p>
-      </div><!-- Student Form -->
-      <form id="attendance-form" class="space-y-4">
-       <div><label for="student-name" class="block text-sm font-medium text-gray-700 mb-2">Nama Mahasiswa</label> <input type="text" id="student-name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan nama lengkap Anda">
-       </div>
-       <div><label for="semester-type" class="block text-sm font-medium text-gray-700 mb-2">Jenis Mahasiswa</label> <select id="semester-type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"> <option value="">Pilih jenis mahasiswa</option> <option value="Semester 1">Mahasiswa Semester 1</option> <option value="Transfer">Mahasiswa Transfer</option> </select>
-       </div>
-       <div><label class="block text-sm font-medium text-gray-700 mb-3">Status Kehadiran</label>
-        <div class="grid grid-cols-3 gap-3"><button type="button" id="status-hadir" class="status-btn px-4 py-3 border-2 border-green-300 text-green-700 rounded-md hover:bg-green-50 transition-colors font-medium"> ✓ Hadir </button> <button type="button" id="status-sakit" class="status-btn px-4 py-3 border-2 border-red-300 text-red-700 rounded-md hover:bg-red-50 transition-colors font-medium"> 🏥 Sakit </button> <button type="button" id="status-ijin" class="status-btn px-4 py-3 border-2 border-yellow-300 text-yellow-700 rounded-md hover:bg-yellow-50 transition-colors font-medium"> 📝 Ijin </button>
-        </div><input type="hidden" id="selected-status" required>
-       </div><button type="submit" id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors"> <span id="submit-text">Absen Sekarang</span> <span id="submit-loading" class="hidden">Menyimpan...</span> </button>
-      </form><!-- Success Message -->
-      <div id="success-message" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
-       <p class="text-green-800 font-medium">✓ Absensi berhasil dicatat!</p>
+   </div><!-- Add/Edit Student Modal -->
+   <div id="studentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-96 mx-4">
+     <h2 id="studentModalTitle" class="text-xl font-bold mb-4">Tambah Mahasiswa</h2>
+     <form id="studentForm">
+      <div class="mb-4"><label for="editStudentName" class="block text-sm font-medium text-gray-700 mb-2">Nama Mahasiswa</label> <input type="text" id="editStudentName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
       </div>
-     </div>
-    </div><!-- Admin Login Page -->
-    <div id="login-page" class="hidden">
-     <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-semibold text-gray-800 mb-6">Login Admin</h2>
-      <form id="login-form" class="space-y-4">
-       <div><label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label> <input type="text" id="username" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-       </div>
-       <div><label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" id="password" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-       </div>
-       <div id="login-error" class="hidden text-red-600 text-sm"></div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"> Login </button>
-      </form><button id="back-to-student" class="w-full mt-3 text-gray-600 hover:text-gray-800 text-sm"> ← Kembali ke Halaman Absensi </button>
-     </div>
-    </div><!-- Admin Dashboard -->
-    <div id="admin-page" class="hidden space-y-6">
-     <div class="flex justify-between items-center">
-      <h2 class="text-2xl font-semibold text-gray-800">Dashboard Admin</h2><button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors"> Logout </button>
-     </div><!-- Add Student -->
-     <div class="bg-white rounded-lg shadow-md p-6">
-      <h3 class="text-lg font-semibold text-gray-800 mb-4">Tambah Mahasiswa</h3>
-      <form id="add-student-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-       <div><label for="new-student-name" class="block text-sm font-medium text-gray-700 mb-2">Nama Mahasiswa</label> <input type="text" id="new-student-name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Nama lengkap">
-       </div>
-       <div><label for="new-semester-type" class="block text-sm font-medium text-gray-700 mb-2">Jenis Mahasiswa</label> <select id="new-semester-type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"> <option value="">Pilih jenis</option> <option value="Semester 1">Semester 1</option> <option value="Transfer">Transfer</option> </select>
-       </div>
-       <div class="flex items-end"><button type="submit" id="add-student-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors"> <span id="add-student-text">Tambah Mahasiswa</span> <span id="add-student-loading" class="hidden">Menambahkan...</span> </button>
-       </div>
-      </form>
-     </div><!-- Download Reports -->
-     <div class="bg-white rounded-lg shadow-md p-6">
-      <h3 class="text-lg font-semibold text-gray-800 mb-4">Download Rekap Absensi</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><button id="download-week" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"> Download Mingguan </button> <button id="download-month" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"> Download Bulanan </button> <button id="download-year" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"> Download Tahunan </button>
+      <div class="mb-4"><label for="editSemester" class="block text-sm font-medium text-gray-700 mb-2">Semester</label> <select id="editSemester" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required> <option value="1">Semester 1</option> <option value="Transfer">Transfer</option> </select>
       </div>
-     </div><!-- Attendance Records -->
-     <div class="bg-white rounded-lg shadow-md p-6">
-      <h3 class="text-lg font-semibold text-gray-800 mb-4">Data Absensi Terbaru</h3>
-      <div id="attendance-records" class="space-y-2">
-       <p class="text-gray-500 text-center py-4">Belum ada data absensi</p>
+      <div class="mb-6"><label for="editJurusan" class="block text-sm font-medium text-gray-700 mb-2">Jurusan</label> <select id="editJurusan" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required> <option value="PAI">PAI</option> <option value="PGMI">PGMI</option> <option value="MPI">MPI</option> <option value="PIAUD">PIAUD</option> <option value="Kelas PONDOK">Kelas PONDOK</option> </select>
       </div>
-     </div>
+      <div class="flex gap-3"><button type="submit" id="saveStudentBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors"> Simpan </button> <button type="button" id="cancelStudent" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors"> Batal </button>
+      </div>
+     </form>
     </div>
-   </main>
+   </div>
   </div>
   <script>
-        // Configuration
+        // Global variables
+        let currentAttendanceStatus = '';
+        let isLoggedIn = false;
+        let currentEditingStudent = null;
+        let attendanceData = [];
+        let studentData = [];
+        let recordCount = 0;
+
+        // Default configuration
         const defaultConfig = {
-            app_title: "Sistem Absensi Mahasiswa",
-            welcome_message: "Selamat datang di sistem absensi"
+            judul_aplikasi: "ABSENSI MAHASISWA AIK STIT MUHAMMADIYAH TEMPURREJO DARING",
+            nama_institusi: "Sistem Absensi Digital"
         };
 
-        let attendanceData = [];
-        let currentPage = 'student';
-        let isLoggedIn = false;
-
-        // Data SDK Handler
+        // Data handler for SDK
         const dataHandler = {
             onDataChanged(data) {
-                attendanceData = data;
-                if (currentPage === 'admin' && isLoggedIn) {
-                    renderAttendanceRecords();
-                }
+                // Separate attendance and student data
+                attendanceData = data.filter(record => record.status_absensi);
+                studentData = data.filter(record => !record.status_absensi);
+                recordCount = data.length;
+                
+                updateStudentDropdown();
+                updateRekapTable();
+                updateStudentList();
             }
         };
 
-        // Initialize SDKs
+        // Initialize SDK
         async function initializeApp() {
-            // Initialize Data SDK
-            const initResult = await window.dataSdk.init(dataHandler);
-            if (!initResult.isOk) {
-                console.error("Failed to initialize data SDK");
-                return;
+            if (window.dataSdk) {
+                const initResult = await window.dataSdk.init(dataHandler);
+                if (!initResult.isOk) {
+                    console.error("Failed to initialize data SDK");
+                }
             }
 
-            // Initialize Element SDK
             if (window.elementSdk) {
                 await window.elementSdk.init({
                     defaultConfig,
                     onConfigChange: async (config) => {
-                        const appTitle = config.app_title || defaultConfig.app_title;
-                        const welcomeMessage = config.welcome_message || defaultConfig.welcome_message;
-                        
-                        document.getElementById('app-title').textContent = appTitle;
-                        document.getElementById('welcome-message').textContent = welcomeMessage;
+                        document.getElementById('judulAplikasi').textContent = config.judul_aplikasi || defaultConfig.judul_aplikasi;
+                        document.getElementById('namaInstitusi').textContent = config.nama_institusi || defaultConfig.nama_institusi;
                     },
                     mapToCapabilities: (config) => ({
                         recolorables: [],
@@ -142,300 +177,283 @@
                         fontSizeable: undefined
                     }),
                     mapToEditPanelValues: (config) => new Map([
-                        ["app_title", config.app_title || defaultConfig.app_title],
-                        ["welcome_message", config.welcome_message || defaultConfig.welcome_message]
+                        ["judul_aplikasi", config.judul_aplikasi || defaultConfig.judul_aplikasi],
+                        ["nama_institusi", config.nama_institusi || defaultConfig.nama_institusi]
                     ])
                 });
             }
-
-            setupEventListeners();
-            updateCurrentDate();
         }
 
-        // Setup Event Listeners
-        function setupEventListeners() {
-            // Admin button
-            document.getElementById('admin-btn').addEventListener('click', () => {
-                showPage('login');
-            });
+        // Set today's date as default
+        document.getElementById('tanggal').valueAsDate = new Date();
 
-            // Back to student page
-            document.getElementById('back-to-student').addEventListener('click', () => {
-                showPage('student');
-            });
+        // Attendance status buttons
+        document.getElementById('hadirBtn').addEventListener('click', function() {
+            selectAttendanceStatus('Hadir', this);
+        });
 
-            // Login form
-            document.getElementById('login-form').addEventListener('submit', handleLogin);
+        document.getElementById('sakitBtn').addEventListener('click', function() {
+            selectAttendanceStatus('Sakit', this);
+        });
 
-            // Logout button
-            document.getElementById('logout-btn').addEventListener('click', () => {
-                isLoggedIn = false;
-                showPage('student');
-            });
+        document.getElementById('izinBtn').addEventListener('click', function() {
+            selectAttendanceStatus('Izin', this);
+        });
 
-            // Status buttons
-            document.getElementById('status-hadir').addEventListener('click', () => selectStatus('Hadir'));
-            document.getElementById('status-sakit').addEventListener('click', () => selectStatus('Sakit'));
-            document.getElementById('status-ijin').addEventListener('click', () => selectStatus('Ijin'));
-
-            // Attendance form
-            document.getElementById('attendance-form').addEventListener('submit', handleAttendance);
-
-            // Add student form
-            document.getElementById('add-student-form').addEventListener('submit', handleAddStudent);
-
-            // Download buttons
-            document.getElementById('download-week').addEventListener('click', () => downloadReport('week'));
-            document.getElementById('download-month').addEventListener('click', () => downloadReport('month'));
-            document.getElementById('download-year').addEventListener('click', () => downloadReport('year'));
-        }
-
-        // Select status function
-        function selectStatus(status) {
+        function selectAttendanceStatus(status, button) {
+            currentAttendanceStatus = status;
+            
             // Reset all buttons
-            document.querySelectorAll('.status-btn').forEach(btn => {
-                btn.classList.remove('bg-green-100', 'bg-red-100', 'bg-yellow-100', 'border-green-500', 'border-red-500', 'border-yellow-500');
-                btn.classList.add('border-green-300', 'border-red-300', 'border-yellow-300');
+            document.querySelectorAll('#hadirBtn, #sakitBtn, #izinBtn').forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-opacity-50');
             });
-
+            
             // Highlight selected button
-            const selectedBtn = document.getElementById(`status-${status.toLowerCase()}`);
-            if (status === 'Hadir') {
-                selectedBtn.classList.remove('border-green-300');
-                selectedBtn.classList.add('bg-green-100', 'border-green-500');
-            } else if (status === 'Sakit') {
-                selectedBtn.classList.remove('border-red-300');
-                selectedBtn.classList.add('bg-red-100', 'border-red-500');
-            } else if (status === 'Ijin') {
-                selectedBtn.classList.remove('border-yellow-300');
-                selectedBtn.classList.add('bg-yellow-100', 'border-yellow-500');
-            }
-
-            // Set hidden input value
-            document.getElementById('selected-status').value = status;
+            button.classList.add('ring-4', 'ring-opacity-50');
+            if (status === 'Hadir') button.classList.add('ring-green-300');
+            else if (status === 'Sakit') button.classList.add('ring-yellow-300');
+            else if (status === 'Izin') button.classList.add('ring-red-300');
         }
 
-        // Show different pages
-        function showPage(page) {
-            document.getElementById('student-page').classList.add('hidden');
-            document.getElementById('login-page').classList.add('hidden');
-            document.getElementById('admin-page').classList.add('hidden');
-
-            if (page === 'student') {
-                document.getElementById('student-page').classList.remove('hidden');
-                currentPage = 'student';
-            } else if (page === 'login') {
-                document.getElementById('login-page').classList.remove('hidden');
-                document.getElementById('login-error').classList.add('hidden');
-                currentPage = 'login';
-            } else if (page === 'admin') {
-                document.getElementById('admin-page').classList.remove('hidden');
-                currentPage = 'admin';
-                renderAttendanceRecords();
-            }
-        }
-
-        // Handle login
-        function handleLogin(e) {
+        // Attendance form submission
+        document.getElementById('attendanceForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            if (!currentAttendanceStatus) {
+                showMessage('Pilih status kehadiran terlebih dahulu!', 'error');
+                return;
+            }
+
+            if (recordCount >= 999) {
+                showMessage('Batas maksimum 999 data tercapai. Hapus beberapa data terlebih dahulu.', 'error');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.classList.add('loading');
+            submitBtn.textContent = 'Menyimpan...';
+
+            const formData = {
+                id: Date.now().toString(),
+                nama_mahasiswa: document.getElementById('studentName').value,
+                semester: document.getElementById('semester').value,
+                jurusan: document.getElementById('jurusan').value,
+                status_absensi: currentAttendanceStatus,
+                tanggal: document.getElementById('tanggal').value,
+                timestamp: new Date().toISOString()
+            };
+
+            if (window.dataSdk) {
+                const result = await window.dataSdk.create(formData);
+                if (result.isOk) {
+                    showMessage('Absensi berhasil disimpan!', 'success');
+                    document.getElementById('attendanceForm').reset();
+                    document.getElementById('tanggal').valueAsDate = new Date();
+                    currentAttendanceStatus = '';
+                    document.querySelectorAll('#hadirBtn, #sakitBtn, #izinBtn').forEach(btn => {
+                        btn.classList.remove('ring-4', 'ring-opacity-50', 'ring-green-300', 'ring-yellow-300', 'ring-red-300');
+                    });
+                } else {
+                    showMessage('Gagal menyimpan absensi. Silakan coba lagi.', 'error');
+                }
+            }
+
+            submitBtn.classList.remove('loading');
+            submitBtn.textContent = 'Simpan Absensi';
+        });
+
+        // Admin login
+        document.getElementById('adminLoginBtn').addEventListener('click', function() {
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('loginModal').classList.add('flex');
+        });
+
+        document.getElementById('cancelLogin').addEventListener('click', function() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('flex');
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').classList.add('hidden');
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-
-            if (username === 'hussein' && password === '347622') {
+            
+            if (username === 'Hussein' && password === '347622') {
                 isLoggedIn = true;
-                showPage('admin');
-                document.getElementById('login-form').reset();
+                document.getElementById('loginModal').classList.add('hidden');
+                document.getElementById('loginModal').classList.remove('flex');
+                document.getElementById('studentPage').classList.add('hidden');
+                document.getElementById('adminPage').classList.remove('hidden');
+                document.getElementById('loginForm').reset();
+                document.getElementById('loginError').classList.add('hidden');
             } else {
-                const errorDiv = document.getElementById('login-error');
-                errorDiv.textContent = 'Username atau password salah!';
-                errorDiv.classList.remove('hidden');
+                document.getElementById('loginError').textContent = 'Username atau password salah!';
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        });
+
+        // Admin logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            isLoggedIn = false;
+            document.getElementById('adminPage').classList.add('hidden');
+            document.getElementById('studentPage').classList.remove('hidden');
+        });
+
+        // Admin tabs
+        document.getElementById('rekapTab').addEventListener('click', function() {
+            switchTab('rekap');
+        });
+
+        document.getElementById('mahasiswaTab').addEventListener('click', function() {
+            switchTab('mahasiswa');
+        });
+
+        document.getElementById('downloadTab').addEventListener('click', function() {
+            switchTab('download');
+        });
+
+        function switchTab(tab) {
+            // Reset all tabs
+            document.querySelectorAll('#rekapTab, #mahasiswaTab, #downloadTab').forEach(t => {
+                t.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                t.classList.add('text-gray-500');
+            });
+            
+            document.querySelectorAll('#rekapContent, #mahasiswaContent, #downloadContent').forEach(c => {
+                c.classList.add('hidden');
+            });
+
+            // Activate selected tab
+            if (tab === 'rekap') {
+                document.getElementById('rekapTab').classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                document.getElementById('rekapTab').classList.remove('text-gray-500');
+                document.getElementById('rekapContent').classList.remove('hidden');
+            } else if (tab === 'mahasiswa') {
+                document.getElementById('mahasiswaTab').classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                document.getElementById('mahasiswaTab').classList.remove('text-gray-500');
+                document.getElementById('mahasiswaContent').classList.remove('hidden');
+            } else if (tab === 'download') {
+                document.getElementById('downloadTab').classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                document.getElementById('downloadTab').classList.remove('text-gray-500');
+                document.getElementById('downloadContent').classList.remove('hidden');
             }
         }
 
-        // Handle attendance submission
-        async function handleAttendance(e) {
+        // Student management
+        document.getElementById('addStudentBtn').addEventListener('click', function() {
+            currentEditingStudent = null;
+            document.getElementById('studentModalTitle').textContent = 'Tambah Mahasiswa';
+            document.getElementById('studentForm').reset();
+            document.getElementById('studentModal').classList.remove('hidden');
+            document.getElementById('studentModal').classList.add('flex');
+        });
+
+        document.getElementById('cancelStudent').addEventListener('click', function() {
+            document.getElementById('studentModal').classList.add('hidden');
+            document.getElementById('studentModal').classList.remove('flex');
+        });
+
+        document.getElementById('studentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            if (attendanceData.length >= 999) {
-                showMessage('Batas maksimum 999 data absensi telah tercapai. Hubungi admin untuk menghapus data lama.', 'error');
+
+            if (recordCount >= 999) {
+                showMessage('Batas maksimum 999 data tercapai. Hapus beberapa data terlebih dahulu.', 'error');
                 return;
             }
 
-            const submitBtn = document.getElementById('submit-btn');
-            const submitText = document.getElementById('submit-text');
-            const submitLoading = document.getElementById('submit-loading');
-            
-            submitText.classList.add('hidden');
-            submitLoading.classList.remove('hidden');
-            submitBtn.disabled = true;
+            const saveBtn = document.getElementById('saveStudentBtn');
+            saveBtn.classList.add('loading');
+            saveBtn.textContent = 'Menyimpan...';
 
-            const nama = document.getElementById('student-name').value;
-            const semester = document.getElementById('semester-type').value;
-            const status = document.getElementById('selected-status').value;
-            const now = new Date();
-
-            const attendanceRecord = {
-                id: Date.now().toString(),
-                nama: nama,
-                semester: semester,
-                tanggal: now.toLocaleDateString('id-ID'),
-                waktu: now.toLocaleTimeString('id-ID'),
-                status: status
+            const studentInfo = {
+                id: currentEditingStudent ? currentEditingStudent.id : Date.now().toString(),
+                nama_mahasiswa: document.getElementById('editStudentName').value,
+                semester: document.getElementById('editSemester').value,
+                jurusan: document.getElementById('editJurusan').value,
+                timestamp: new Date().toISOString()
             };
 
-            const result = await window.dataSdk.create(attendanceRecord);
-            
-            submitText.classList.remove('hidden');
-            submitLoading.classList.add('hidden');
-            submitBtn.disabled = false;
+            if (window.dataSdk) {
+                let result;
+                if (currentEditingStudent) {
+                    result = await window.dataSdk.update({ ...studentInfo, __backendId: currentEditingStudent.__backendId });
+                } else {
+                    result = await window.dataSdk.create(studentInfo);
+                }
 
-            if (result.isOk) {
-                document.getElementById('attendance-form').reset();
-                // Reset status buttons
-                document.querySelectorAll('.status-btn').forEach(btn => {
-                    btn.classList.remove('bg-green-100', 'bg-red-100', 'bg-yellow-100', 'border-green-500', 'border-red-500', 'border-yellow-500');
-                });
-                document.getElementById('status-hadir').classList.add('border-green-300');
-                document.getElementById('status-sakit').classList.add('border-red-300');
-                document.getElementById('status-ijin').classList.add('border-yellow-300');
-                
-                document.getElementById('success-message').classList.remove('hidden');
-                setTimeout(() => {
-                    document.getElementById('success-message').classList.add('hidden');
-                }, 3000);
-            } else {
-                showMessage('Gagal menyimpan absensi. Silakan coba lagi.', 'error');
-            }
-        }
-
-        // Handle add student (admin)
-        async function handleAddStudent(e) {
-            e.preventDefault();
-            
-            if (attendanceData.length >= 999) {
-                showMessage('Batas maksimum 999 data telah tercapai. Hapus beberapa data terlebih dahulu.', 'error');
-                return;
+                if (result.isOk) {
+                    showMessage(currentEditingStudent ? 'Data mahasiswa berhasil diperbarui!' : 'Mahasiswa berhasil ditambahkan!', 'success');
+                    document.getElementById('studentModal').classList.add('hidden');
+                    document.getElementById('studentModal').classList.remove('flex');
+                } else {
+                    showMessage('Gagal menyimpan data mahasiswa. Silakan coba lagi.', 'error');
+                }
             }
 
-            const addBtn = document.getElementById('add-student-btn');
-            const addText = document.getElementById('add-student-text');
-            const addLoading = document.getElementById('add-student-loading');
-            
-            addText.classList.add('hidden');
-            addLoading.classList.remove('hidden');
-            addBtn.disabled = true;
+            saveBtn.classList.remove('loading');
+            saveBtn.textContent = 'Simpan';
+        });
 
-            const nama = document.getElementById('new-student-name').value;
-            const semester = document.getElementById('new-semester-type').value;
-            const now = new Date();
+        // Download functions
+        document.getElementById('downloadWeekly').addEventListener('click', function() {
+            downloadReport('weekly');
+        });
 
-            const studentRecord = {
-                id: Date.now().toString(),
-                nama: nama,
-                semester: semester,
-                tanggal: now.toLocaleDateString('id-ID'),
-                waktu: now.toLocaleTimeString('id-ID'),
-                status: 'Ditambahkan oleh Admin'
-            };
+        document.getElementById('downloadMonthly').addEventListener('click', function() {
+            downloadReport('monthly');
+        });
 
-            const result = await window.dataSdk.create(studentRecord);
-            
-            addText.classList.remove('hidden');
-            addLoading.classList.add('hidden');
-            addBtn.disabled = false;
+        document.getElementById('downloadYearly').addEventListener('click', function() {
+            downloadReport('yearly');
+        });
 
-            if (result.isOk) {
-                document.getElementById('add-student-form').reset();
-                showMessage('Mahasiswa berhasil ditambahkan!', 'success');
-            } else {
-                showMessage('Gagal menambahkan mahasiswa. Silakan coba lagi.', 'error');
-            }
-        }
-
-        // Render attendance records
-        function renderAttendanceRecords() {
-            const container = document.getElementById('attendance-records');
-            
-            if (attendanceData.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center py-4">Belum ada data absensi</p>';
-                return;
-            }
-
-            const sortedData = [...attendanceData].sort((a, b) => new Date(b.id) - new Date(a.id));
-            const recentData = sortedData.slice(0, 10);
-
-            container.innerHTML = recentData.map(record => `
-                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-md">
-                    <div>
-                        <p class="font-medium text-gray-900">${record.nama}</p>
-                        <p class="text-sm text-gray-600">${record.semester} • ${record.tanggal} ${record.waktu}</p>
-                    </div>
-                    <span class="px-2 py-1 text-xs font-medium rounded-full ${
-                        record.status === 'Hadir' ? 'bg-green-100 text-green-800' : 
-                        record.status === 'Sakit' ? 'bg-red-100 text-red-800' :
-                        record.status === 'Ijin' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-blue-100 text-blue-800'
-                    }">
-                        ${record.status}
-                    </span>
-                </div>
-            `).join('');
-        }
-
-        // Download report
         function downloadReport(period) {
-            if (attendanceData.length === 0) {
-                showMessage('Tidak ada data untuk didownload', 'error');
-                return;
-            }
-
             const now = new Date();
-            let filteredData = [];
+            let filteredData = attendanceData;
             let filename = '';
 
-            if (period === 'week') {
+            if (period === 'weekly') {
                 const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                filteredData = attendanceData.filter(record => {
-                    const recordDate = new Date(parseInt(record.id));
-                    return recordDate >= weekAgo;
-                });
-                filename = `absensi_mingguan_${now.toLocaleDateString('id-ID').replace(/\//g, '-')}.csv`;
-            } else if (period === 'month') {
+                filteredData = attendanceData.filter(record => new Date(record.tanggal) >= weekAgo);
+                filename = `absensi_mingguan_${now.toISOString().split('T')[0]}.csv`;
+            } else if (period === 'monthly') {
                 const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-                filteredData = attendanceData.filter(record => {
-                    const recordDate = new Date(parseInt(record.id));
-                    return recordDate >= monthAgo;
-                });
-                filename = `absensi_bulanan_${now.toLocaleDateString('id-ID').replace(/\//g, '-')}.csv`;
-            } else if (period === 'year') {
+                filteredData = attendanceData.filter(record => new Date(record.tanggal) >= monthAgo);
+                filename = `absensi_bulanan_${now.toISOString().split('T')[0]}.csv`;
+            } else if (period === 'yearly') {
                 const yearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-                filteredData = attendanceData.filter(record => {
-                    const recordDate = new Date(parseInt(record.id));
-                    return recordDate >= yearAgo;
-                });
-                filename = `absensi_tahunan_${now.getFullYear()}.csv`;
+                filteredData = attendanceData.filter(record => new Date(record.tanggal) >= yearAgo);
+                filename = `absensi_tahunan_${now.toISOString().split('T')[0]}.csv`;
             }
 
             if (filteredData.length === 0) {
-                showMessage(`Tidak ada data absensi untuk periode ${period === 'week' ? 'mingguan' : period === 'month' ? 'bulanan' : 'tahunan'}`, 'error');
+                showMessage(`Tidak ada data absensi untuk periode ${period === 'weekly' ? 'mingguan' : period === 'monthly' ? 'bulanan' : 'tahunan'}.`, 'error');
                 return;
             }
 
-            // Create CSV content
-            const headers = ['Nama', 'Jenis Mahasiswa', 'Tanggal', 'Waktu', 'Status'];
-            const csvContent = [
-                headers.join(','),
-                ...filteredData.map(record => [
-                    `"${record.nama}"`,
-                    `"${record.semester}"`,
-                    `"${record.tanggal}"`,
-                    `"${record.waktu}"`,
-                    `"${record.status}"`
-                ].join(','))
-            ].join('\n');
+            const csvContent = generateCSV(filteredData);
+            downloadCSV(csvContent, filename);
+            showMessage(`Laporan ${period === 'weekly' ? 'mingguan' : period === 'monthly' ? 'bulanan' : 'tahunan'} berhasil diunduh!`, 'success');
+        }
 
-            // Download file
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        function generateCSV(data) {
+            const headers = ['Nama Mahasiswa', 'Semester', 'Jurusan', 'Status Kehadiran', 'Tanggal'];
+            const rows = data.map(record => [
+                record.nama_mahasiswa,
+                record.semester,
+                record.jurusan,
+                record.status_absensi,
+                record.tanggal
+            ]);
+
+            return [headers, ...rows].map(row => row.join(',')).join('\n');
+        }
+
+        function downloadCSV(content, filename) {
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.setAttribute('href', url);
@@ -444,27 +462,143 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-
-            showMessage(`Rekap absensi ${period === 'week' ? 'mingguan' : period === 'month' ? 'bulanan' : 'tahunan'} berhasil didownload!`, 'success');
         }
 
-        // Update current date
-        function updateCurrentDate() {
-            const now = new Date();
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            };
-            document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', options);
+        // Update functions
+        function updateStudentDropdown() {
+            const dropdown = document.getElementById('studentName');
+            dropdown.innerHTML = '<option value="">Pilih Nama Mahasiswa</option>';
+            
+            studentData.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.nama_mahasiswa;
+                option.textContent = `${student.nama_mahasiswa} - ${student.jurusan} (${student.semester})`;
+                dropdown.appendChild(option);
+            });
         }
 
-        // Show message
+        function updateRekapTable() {
+            const tbody = document.getElementById('rekapTableBody');
+            
+            if (attendanceData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                            Belum ada data absensi
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = attendanceData.map(record => `
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">${record.nama_mahasiswa}</td>
+                    <td class="border border-gray-300 px-4 py-2">${record.semester}</td>
+                    <td class="border border-gray-300 px-4 py-2">${record.jurusan}</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        <span class="px-2 py-1 rounded text-sm ${
+                            record.status_absensi === 'Hadir' ? 'bg-green-100 text-green-800' :
+                            record.status_absensi === 'Sakit' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                        }">
+                            ${record.status_absensi}
+                        </span>
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">${record.tanggal}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStudentList() {
+            const container = document.getElementById('studentList');
+            
+            if (studentData.length === 0) {
+                container.innerHTML = `
+                    <div class="text-gray-500 text-center py-8">
+                        Belum ada data mahasiswa. Klik "Tambah Mahasiswa" untuk menambah data.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = studentData.map(student => `
+                <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
+                    <div>
+                        <h4 class="font-medium">${student.nama_mahasiswa}</h4>
+                        <p class="text-sm text-gray-600">${student.jurusan} - ${student.semester}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editStudent('${student.__backendId}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            Edit
+                        </button>
+                        <button onclick="deleteStudent('${student.__backendId}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            Hapus
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Global functions for student management
+        window.editStudent = function(backendId) {
+            const student = studentData.find(s => s.__backendId === backendId);
+            if (student) {
+                currentEditingStudent = student;
+                document.getElementById('studentModalTitle').textContent = 'Edit Mahasiswa';
+                document.getElementById('editStudentName').value = student.nama_mahasiswa;
+                document.getElementById('editSemester').value = student.semester;
+                document.getElementById('editJurusan').value = student.jurusan;
+                document.getElementById('studentModal').classList.remove('hidden');
+                document.getElementById('studentModal').classList.add('flex');
+            }
+        };
+
+        window.deleteStudent = async function(backendId) {
+            const student = studentData.find(s => s.__backendId === backendId);
+            if (student && window.dataSdk) {
+                // Create inline confirmation
+                const studentElement = event.target.closest('.bg-gray-50');
+                const originalContent = studentElement.innerHTML;
+                
+                studentElement.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-red-600">Hapus ${student.nama_mahasiswa}?</span>
+                        <div class="flex gap-2">
+                            <button onclick="confirmDelete('${backendId}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                                Ya, Hapus
+                            </button>
+                            <button onclick="cancelDelete(this, \`${originalContent.replace(/`/g, '\\`')}\`)" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">
+                                Batal
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        };
+
+        window.confirmDelete = async function(backendId) {
+            const student = studentData.find(s => s.__backendId === backendId);
+            if (student && window.dataSdk) {
+                const result = await window.dataSdk.delete(student);
+                if (result.isOk) {
+                    showMessage('Mahasiswa berhasil dihapus!', 'success');
+                } else {
+                    showMessage('Gagal menghapus mahasiswa. Silakan coba lagi.', 'error');
+                }
+            }
+        };
+
+        window.cancelDelete = function(button, originalContent) {
+            const studentElement = button.closest('.bg-gray-50');
+            studentElement.innerHTML = originalContent;
+        };
+
+        // Utility function for showing messages
         function showMessage(message, type) {
             const messageDiv = document.createElement('div');
-            messageDiv.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
-                type === 'success' ? 'bg-green-100 border border-green-200 text-green-800' : 'bg-red-100 border border-red-200 text-red-800'
+            messageDiv.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
             }`;
             messageDiv.textContent = message;
             
@@ -475,8 +609,8 @@
             }, 3000);
         }
 
-        // Initialize app when page loads
-        document.addEventListener('DOMContentLoaded', initializeApp);
+        // Initialize the application
+        initializeApp();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9988ad6bb3b7ddfc',t:'MTc2MjEzOTQxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99892b9135fd8336',t:'MTc2MjE0NDU4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
